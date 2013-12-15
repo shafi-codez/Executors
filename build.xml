@@ -71,4 +71,11 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <jar destfile="Executors.jar">
+        <zipgroupfileset dir="lib" includes="*.jar" /> 
+        <manifest>
+            <attribute name="Main-Class" value="com.src.queue"/>
+        </manifest>
+    </jar>
+    
 </project>

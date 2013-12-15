@@ -9,6 +9,7 @@ import java.sql.Statement;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import java.util.HashMap;
+import com.util.Constants;
 
 /**
  * Class Responsible for the Data Base work
@@ -45,7 +46,11 @@ public class DBManager {
     public static Connection getConn() {
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/itm411db", "itm411db", "itm411db");
+            StringBuilder dbURL = new StringBuilder();
+            dbURL.append("jdbc:mysql://").append(Constants.hostName).append(":").append(Constants.dbPort)
+                    .append("/").append(Constants.dbName);
+            //conn = DriverManager.getConnection("jdbc:mysql://bonfield.sat.iit.edu:3306/mysql", "root", "ecir_te_2007x");
+            conn = DriverManager.getConnection(dbURL.toString(), Constants.dbUser, Constants.dbPwd);
         } catch (Exception e) {
             System.err.println("Connection Failed :" + e.getLocalizedMessage());
         }
@@ -57,18 +62,15 @@ public class DBManager {
             Connection con = DBManager.getConn();
             ResultSet rs = null;
             Statement st = con.createStatement();
-            String qr = "SELECT * FROM REQUEST WHERE JID="+uid;
+            String qr = "SELECT * FROM REQUEST WHERE JID=" + uid;
             rs = st.executeQuery(qr);
-            
+
             return rs;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
-    
-    
-    
 
     public void startConnection() throws SQLException {
         //this.connection = DriverManager.getConnection(getUrl(), getUsername(), getPassword());

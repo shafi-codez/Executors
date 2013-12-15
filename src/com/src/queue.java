@@ -53,13 +53,14 @@ public class queue {
 
             // Send a message
             System.out.println("Sending a message to MyQueue.\n");
-            sqs.sendMessage(new SendMessageRequest(myQueueUrl, "3"));
-            sqs.sendMessage(new SendMessageRequest(myQueueUrl, "2"));
-            sqs.sendMessage(new SendMessageRequest(myQueueUrl, "1"));
+            sqs.sendMessage(new SendMessageRequest(myQueueUrl, "5"));
+            sqs.sendMessage(new SendMessageRequest(myQueueUrl, "6"));
+            //sqs.sendMessage(new SendMessageRequest(myQueueUrl, "5"));
+
             //sqs.changeMessageVisibility();
 
             ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(myQueueUrl).
-                    withMaxNumberOfMessages(Constants.TaskPerWorker);
+                    withWaitTimeSeconds(10).withMaxNumberOfMessages(Constants.TaskPerWorker);
 
             System.out.println("Receiving messages from MyQueue.\n");
 
@@ -67,43 +68,23 @@ public class queue {
             System.out.println("Message Size " + messages.size());
             ExecutorService executor = Executors.newFixedThreadPool(Constants.TaskPerWorker);
 
-            while (messages.size() > 0) {
+            if (messages.size() == Constants.TaskPerWorker) {
                 for (Message message : messages) {
-                    Runnable worker = new WorkerThread(message);
+                    Runnable worker = new WorkerThread(message, s3);
                     executor.execute(worker);
-                    //WorkerThread task = new WorkerThread(message);
+                    System.out.println("Deleting a message.\n");
+                    String messageRecieptHandle = message.getReceiptHandle();
+                    sqs.deleteMessage(new DeleteMessageRequest(myQueueUrl, messageRecieptHandle));
                 }
                 System.out.println();
 
-                // Delete a message
-                System.out.println("Deleting a message.\n");
-                String messageRecieptHandle = messages.get(0).getReceiptHandle();
-                sqs.deleteMessage(new DeleteMessageRequest(myQueueUrl, messageRecieptHandle));
-
                 executor.shutdown();
                 while (!executor.isTerminated()) {
+                    //wiating for Thread to Terminate
                 }
                 System.out.println("Finished all threads");
+                // Delete a message
             }
-
-
-            System.out.println();
-            ResultSet rs = DBManager.getResult(3);
-            while (rs.next()) {
-                System.out.println("Result >>" + rs.getString(5));
-                if (rs.getString(6).equalsIgnoreCase("PENDING")) {
-                    String bName = rs.getString(4);
-                    String key = rs.getString(5);
-                    System.out.println("Downloading an object " + bName + " " + key);
-                    S3Object object = s3.getObject(new GetObjectRequest(bName, key));
-                    s3.getObject(
-                            new GetObjectRequest(bName, key),
-                            new File("E:\\lunatmp\\" + key));
-
-                }
-            }
-
-
 
         } catch (AmazonServiceException ase) {
             System.out.println("Caught an AmazonServiceException, which means your request made it "
@@ -123,12 +104,5 @@ public class queue {
         }
     }
 
-    private String scriptGen(String fileLoc, String type) {
-        StringBuffer cmd = new StringBuffer();
-        if (type.endsWith("ipad")) {
-            cmd.append("sudo HandBrakeCLI -i ").append(fileLoc)
-                    .append("-o ").append(fileLoc).append("ipad -e x264 -q 32 -B 128 -w 800 --loose-anamorphic -O");
-        }
-        return cmd.toString();
-    }
+    
 }
