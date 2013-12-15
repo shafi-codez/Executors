@@ -77,7 +77,7 @@ public class WorkerThread implements Runnable {
                     S3Object object = s3.getObject(new GetObjectRequest(bName, key));
                     s3.getObject(
                             new GetObjectRequest(bName, key),
-                            new File("/tmp" + key));
+                            new File("/tmp/" + key));
                     
                     invokeCmd("/tmp/" + key);
                 }
