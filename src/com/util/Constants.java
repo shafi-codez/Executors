@@ -10,7 +10,7 @@ package com.util;
  */
 public class Constants {
     
-    public static final String hostName = "localhost";
+    public static final String hostName = "192.168.1.66";
     
     public static final String dbPort = "3306";
     
