@@ -14,11 +14,11 @@ public class Constants {
     
     public static final String dbPort = "3306";
     
-    public static final String dbUser ="itm411db";
+    public static final String dbUser ="root";
     
-    public static final String dbPwd ="itm411db";
+    public static final String dbPwd ="-7stesle";
     
-    public static final String dbName ="itm411db";
+    public static final String dbName ="lunaDB";
             
     
     public static final String tmpDir = "E:\\lunatmp\\";
