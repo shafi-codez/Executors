@@ -19,8 +19,7 @@ public class Constants {
     public static final String dbPwd ="-7stesle";
     
     public static final String dbName ="lunaDB";
-            
-    
+              
     public static final String tmpDir = "E:\\lunatmp\\";
     
     public static final String WinConfigPath = "E:\\Dropbox\\";

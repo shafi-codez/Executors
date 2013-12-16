@@ -75,11 +75,21 @@ public class WorkerThread implements Runnable {
                     String key = rs.getString(5);
                     System.out.println("Downloading an object " + bName + " " + key);
                     S3Object object = s3.getObject(new GetObjectRequest(bName, key));
+
                     s3.getObject(
                             new GetObjectRequest(bName, key),
                             new File("/tmp/" + key));
+
+                    System.out.println("Download Completed");
+                    File f = new File("/tmp/" + key);
+
+                    if (f.exists()) {
+                        System.out.println("File existed");
+                        invokeCmd("/tmp/" + key);
+                    } else {
+                        System.out.println("File not found!");
+                    }
                     
-                    invokeCmd("/tmp/" + key);
                 }
             }
         } catch (Exception ex) {
@@ -97,9 +107,10 @@ public class WorkerThread implements Runnable {
         return cmd.toString();
     }
 
-    private void invokeCmd(String fileName) throws IOException {
+    private void invokeCmd(String fileName) throws IOException, InterruptedException {
         String s = null;
         Process p = Runtime.getRuntime().exec(scriptGen(fileName, "ipad"));
+        p.waitFor();
         int exitVal = p.exitValue();
         System.out.println("Process exitValue: " + exitVal);
         BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
